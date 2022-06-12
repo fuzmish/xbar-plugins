@@ -163,7 +163,7 @@ def create_entry_from_uri(uri: str, entry_type: str):
                                 if host.startswith("ssh://"):
                                     ret["icon"] += ENTRY_ICON_SSH
                 else:
-                    hostPath = config
+                    hostPath = path_unexpand_user(config)
                 ret["label"] = f"[DevContainer {hostPath}] {folder}"
 
             if mode == "attached-container":
