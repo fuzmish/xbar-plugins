@@ -322,13 +322,16 @@ def emit_xbar_menu_item_for_entry(
     icon = entry["icon"]
     if additional_icon is not None:
         icon = f"{additional_icon}{icon}"
+    option = "--folder-uri"
+    if entry["type"] == "workspace":
+        option = "--file-uri"
     emit_xbar_menu_item(
         entry["label"],
         {
             "depth": start_depth,
             "icon": icon,
             "length": MAX_LABEL_TEXT_LENGTH,
-            "command": f"'{VSCODE_CLI_BIN}' --folder-uri '{uri}'",
+            "command": f"'{VSCODE_CLI_BIN}' {option} '{uri}'",
         },
     )
 
