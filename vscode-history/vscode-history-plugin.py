@@ -11,7 +11,7 @@
 # <xbar.image>https://raw.githubusercontent.com/fuzmish/xbar-plugins/main/vscode-history/docs/screenshot.png</xbar.image>
 # <xbar.abouturl>https://github.com/fuzmish/xbar-plugins/tree/main/vscode-history</xbar.abouturl>
 #
-import collections
+from collections.abc import MutableMapping
 import json
 from os import path
 import re
@@ -108,7 +108,7 @@ def flatten_dict(d: dict, prefix="", separator=".") -> dict:
     items = []
     for k, v in d.items():
         new_key = prefix + separator + k if prefix else k
-        if isinstance(v, collections.MutableMapping):
+        if isinstance(v, MutableMapping):
             items.extend(flatten_dict(v, new_key, separator).items())
         else:
             items.append((new_key, v))
@@ -154,7 +154,10 @@ def create_entry_from_uri(uri: str, entry_type: str):
             if mode == "dev-container":
                 ret["icon"] = ENTRY_ICON_DEV_CONTAINER
                 if isinstance(config, dict):
-                    hostPath = path_unexpand_user(config["hostPath"])
+                    if "hostPath" in config:
+                        hostPath = path_unexpand_user(config["hostPath"])
+                    else:
+                        hostPath = ""
                     if "settings" in config:
                         if "host" in config["settings"]:
                             host = config["settings"]["host"]
@@ -162,6 +165,9 @@ def create_entry_from_uri(uri: str, entry_type: str):
                                 hostPath += f" @ {host}"
                                 if host.startswith("ssh://"):
                                     ret["icon"] += ENTRY_ICON_SSH
+                        elif "context" in config["settings"]:
+                            context = config["settings"]["context"]
+                            hostPath += f" @ {context}"
                 else:
                     hostPath = path_unexpand_user(config)
                 ret["label"] = f"[DevContainer {hostPath}] {folder}"
